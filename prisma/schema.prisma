@@ -22,11 +22,11 @@ model User {
 
   isAdmin Boolean
 
-  school School? @relation(fields: [schoolId], references: [id])
+  school School @relation(fields: [schoolId], references: [id])
 
   dateCreated DateTime @default(now())
 
-  schoolId String?
+  schoolId String
 }
 
 model School {
@@ -58,7 +58,7 @@ model Student {
 
   formOfStudy String
 
-  School School? @relation(fields: [schoolId], references: [id])
+  School School @relation(fields: [schoolId], references: [id])
 
-  schoolId String?
+  schoolId String
 }

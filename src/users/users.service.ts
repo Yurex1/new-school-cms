@@ -11,8 +11,9 @@ export class UsersService {
   }
 
   async createOne(data: Prisma.UserCreateInput) {
-    return this.prisma.user.create({
+    const result = this.prisma.user.create({
       data,
     });
+    return result;
   }
 }
