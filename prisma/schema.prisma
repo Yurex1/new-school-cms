@@ -7,36 +7,58 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+
+  url = env("DATABASE_URL")
 }
 
 model User {
-  id   Int    @id @default(autoincrement())
-  name String
-  //required: true
+  id String @id @default(cuid())
 
-  login    String
-  //required: true
+  name String
+
+  login String
+
   password String
-  // required: true
-  isAdmin  String
-  school   String
-  date     DateTime @default(now())
+
+  isAdmin Boolean
+
+  school School? @relation(fields: [schoolId], references: [id])
+
+  dateCreated DateTime @default(now())
+
+  schoolId String?
 }
 
 model School {
-  id   Int    @id
+  id String @id @default(cuid())
+
   name String
+
   type String
+
+  students Student[]
+
+  users User[]
 }
 
-model Note {
-  id               Int    @id @default(autoincrement())
-  fullname         String
+model Student {
+  id String @id @default(cuid())
+
+  fullname String
+
   locationOfLiving String
-  locationOfStudy  String
-  dateOfBirth      String
-  specialCategory  String
-  sex              String
-  formOfStudy      String
+
+  locationOfStudy String
+
+  dateOfBirth String
+
+  specialCategory String
+
+  sex String
+
+  formOfStudy String
+
+  School School? @relation(fields: [schoolId], references: [id])
+
+  schoolId String?
 }
