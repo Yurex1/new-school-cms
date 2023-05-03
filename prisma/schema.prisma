@@ -44,13 +44,13 @@ model School {
 model Student {
   id String @id @default(cuid())
 
-  fullname String
+  fullName String
 
   locationOfLiving String
 
   locationOfStudy String
 
-  dateOfBirth String
+  dateOfBirth DateTime @db.Date
 
   specialCategory String
 
@@ -58,7 +58,7 @@ model Student {
 
   formOfStudy String
 
-  School School @relation(fields: [schoolId], references: [id])
+  school School @relation(fields: [schoolId], references: [id])
 
   schoolId String
 }
