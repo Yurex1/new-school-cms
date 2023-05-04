@@ -35,6 +35,7 @@ export class AuthService {
     isAdmin: boolean,
     schoolId: string,
   ) {
+    console.log(password);
     const user = await this.usersService.createOne({
       name: username,
       password: await bcrypt.hash(password, 10),
@@ -42,6 +43,7 @@ export class AuthService {
       isAdmin: isAdmin,
       school: { connect: { id: schoolId } },
     });
+
     return user;
   }
 }

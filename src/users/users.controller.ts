@@ -1,14 +1,19 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { RegisterUserDto } from 'src/dto/register-user.dto';
+import { UpdateUserDto } from './dto/update-user-dto';
 
 @Controller('/api/users')
 export class UsersController {
-  //   @Post()
-  //   async register(@Body() registerUserDto: RegisterUserDto) {
-  //     return await this.authService.register(
-  //       registerUserDto.username,
-  //       registerUserDto.password,
-  //     );
-  //   }
+  constructor(private readonly userService: UsersService) {}
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    console.log('1231');
+    return await this.userService.updateUser(id, updateUserDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.userService.deleteUser(id);
+  }
 }

@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, Student, User } from '@prisma/client';
 
 @Injectable()
 export class SchoolService {
@@ -18,5 +18,21 @@ export class SchoolService {
       type: type,
     });
     return user;
+  }
+
+  async findSchool(id: string) {
+    const result = await this.prisma.school.findUnique({ where: { id: id } });
+    if (result === null) {
+      throw new NotFoundException(`School ${id} is not found`);
+    }
+    return result;
+  }
+
+  async updateSchool(id: string, data: Prisma.SchoolUpdateInput) {
+    await this.findSchool(id);
+    return await this.prisma.school.update({
+      where: { id: id },
+      data,
+    });
   }
 }
