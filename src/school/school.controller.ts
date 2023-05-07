@@ -31,8 +31,14 @@ export class SchoolController {
   ) {
     return await this.schoolService.updateSchool(id, updateSchoolDto);
   }
+
   @Get(':id')
   async get(@Param('id') id: string) {
     return await this.schoolService.findSchool(id);
+  }
+
+  @Get()
+  async getAll() {
+    return await this.schoolService.getAll();
   }
 }

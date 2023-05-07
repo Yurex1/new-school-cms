@@ -1,4 +1,14 @@
-import { Controller, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Put,
+  Delete,
+  Param,
+  Body,
+  Get,
+  Req,
+  ExecutionContext,
+} from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user-dto';
 
@@ -14,6 +24,13 @@ export class UsersController {
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
+    console.log('delete');
     return await this.userService.deleteUser(id);
+  }
+
+  @Get('/me')
+  async getCurrentUser(@Req() req: Request) {
+    console.log(req.session);
+    return req.sessionID;
   }
 }

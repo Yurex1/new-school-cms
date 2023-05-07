@@ -42,7 +42,10 @@ export class StudentsController {
 
   @Get(':id')
   async get(@Param('id') id: string) {
-    console.log('res', this.studentsService.findOne(id));
     return await this.studentsService.findOne(id);
+  }
+  @Get()
+  async getAll() {
+    return await this.studentsService.getAll();
   }
 }

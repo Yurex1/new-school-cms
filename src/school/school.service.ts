@@ -35,4 +35,12 @@ export class SchoolService {
       data,
     });
   }
+
+  async getAll() {
+    const result = await this.prisma.school.findMany();
+    if (result === null) {
+      throw new NotFoundException(`No schools found`);
+    }
+    return result;
+  }
 }

@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from '@prisma/client';
-import { error } from 'console';
 
 @Injectable()
 export class StudentsService {
@@ -33,5 +32,12 @@ export class StudentsService {
     return await this.prisma.student.delete({
       where: { id: id },
     });
+  }
+  async getAll() {
+    const result = this.prisma.student.findMany();
+    if (result === null) {
+      throw new NotFoundException(`Students not found`);
+    }
+    return result;
   }
 }
