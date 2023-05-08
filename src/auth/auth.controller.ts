@@ -12,31 +12,18 @@ import {
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 
-import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { Admin } from './admin.decorator';
 
 @Controller('/api/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {
-    console.log('contoller');
-  }
-
-  // @UseGuards(AuthGuard('local'))
-  // @Post('login')
-  // async localLogin(@Req() req) {
-  //   return req.user;
-  // }
+  constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   signIn(@Body() signInDto: Record<string, any>) {
     return this.authService.signIn(signInDto.username, signInDto.password);
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('me')
-  getProfile(@Request() req) {
-    return req.user;
   }
 
   @Post('register')

@@ -27,7 +27,7 @@ export class AuthService {
       console.log('Not right password');
       throw new UnauthorizedException();
     }
-    const payload = { username: user.username, sub: user.userId };
+    const payload = { id: user.id };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
@@ -42,8 +42,8 @@ export class AuthService {
   ) {
     const user = await this.usersService.createOne({
       login: login,
-      name: username,
       password: await bcrypt.hash(password, 10),
+      name: username,
       isAdmin: isAdmin,
       school: { connect: { id: schoolId } },
     });

@@ -28,6 +28,10 @@ export class SchoolService {
     return result;
   }
 
+  async deleteSchool(id: string) {
+    return this.prisma.school.delete({ where: { id } });
+  }
+
   async updateSchool(id: string, data: Prisma.SchoolUpdateInput) {
     await this.findSchool(id);
     return await this.prisma.school.update({

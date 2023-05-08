@@ -5,32 +5,46 @@ import {
   Param,
   Body,
   Get,
-  Req,
+  Request,
   ExecutionContext,
+  UseGuards,
 } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user-dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Admin } from 'src/auth/admin.decorator';
 
 @Controller('/api/users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Admin()
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    console.log('1231');
-    return await this.userService.updateUser(id, updateUserDto);
+  async update(
+    @Param('id') userLogin: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return await this.userService.updateUser(userLogin, updateUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Admin()
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id') userLogin: string) {
     console.log('delete');
-    return await this.userService.deleteUser(id);
+    return await this.userService.deleteUser(userLogin);
   }
 
-  @Get('/me')
-  async getCurrentUser(@Req() req: Request) {
-    console.log(req.session);
-    return req.sessionID;
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getProfile(@Request() req) {
+    return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getAllUsers() {
+    return this.userService.getAllUsers();
   }
 }

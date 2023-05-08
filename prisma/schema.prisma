@@ -14,11 +14,11 @@ datasource db {
 model User {
   id String @id @default(cuid())
 
-  login String @unique
+  login String @unique // логін за яким заходити
 
   password String
 
-  name String
+  name String //ім`я, прізвище
 
   isAdmin Boolean
 

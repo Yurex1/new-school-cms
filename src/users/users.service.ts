@@ -1,7 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-export type User = any;
+import { User } from '@prisma/client';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { NEVER, never } from 'rxjs';
 
 @Injectable()
 export class UsersService {
@@ -30,17 +36,35 @@ export class UsersService {
   // }
 
   async createOne(data: Prisma.UserCreateInput) {
-    const result = await this.prisma.user.create({
+    const user = await this.prisma.user.findFirst({
+      where: {
+        login: data.login,
+      },
+    });
+    if (user === null) {
+      return await this.prisma.user.create({
+        data,
+      });
+    } else {
+      throw new ConflictException(
+        `User with the same login ${data.login} has already been created`,
+      );
+    }
+  }
+
+  async getAllUsers() {
+    return this.prisma.user.findMany();
+  }
+
+  async updateUser(username: string, data: Prisma.UserUpdateInput) {
+    const user: User = await this.findByLogin(username);
+    return await this.prisma.user.update({
+      where: { id: user.id },
       data,
     });
-    return result;
   }
-  async updateUser(id: string, data: Prisma.UserUpdateInput) {
-    await this.findById(id);
-    return await this.prisma.user.update({ where: { id: id }, data });
-  }
-  async deleteUser(id: string) {
-    await this.findById(id);
-    return await this.prisma.user.delete({ where: { id: id } });
+  async deleteUser(username: string) {
+    const user: User = await this.findByLogin(username);
+    return await this.prisma.user.delete({ where: { id: user.id } });
   }
 }
