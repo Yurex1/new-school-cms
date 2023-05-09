@@ -1,12 +1,9 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Post,
-  Put,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';

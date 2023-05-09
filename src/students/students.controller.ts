@@ -4,7 +4,6 @@ import {
   Body,
   Put,
   Param,
-  NotFoundException,
   Delete,
   Get,
   UseGuards,
