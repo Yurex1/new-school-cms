@@ -13,7 +13,7 @@ import { AdminGuard } from './admin.guard';
 @Module({
   imports: [
     UsersModule,
-    // PassportModule,
+    PassportModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
@@ -22,6 +22,6 @@ import { AdminGuard } from './admin.guard';
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, AdminGuard],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, PassportModule, JwtModule],
 })
 export class AuthModule {}

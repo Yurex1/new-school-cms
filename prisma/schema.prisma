@@ -12,7 +12,7 @@ datasource db {
 }
 
 model User {
-  id String @id @default(cuid())
+  id String @id @unique @default(cuid())
 
   login String @unique // логін за яким заходити
 
@@ -48,9 +48,7 @@ model Student {
 
   locationOfLiving String
 
-  locationOfStudy String
-
-  dateOfBirth DateTime @db.Date
+  dateOfBirth DateTime @db.Timestamp()
 
   specialCategory String
 

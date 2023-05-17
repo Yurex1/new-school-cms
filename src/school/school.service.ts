@@ -28,8 +28,34 @@ export class SchoolService {
     return result;
   }
 
-  async deleteSchool(id: string) {
-    return this.prisma.school.delete({ where: { id } });
+  async deleteSchool(id: string[]) {
+    await this.prisma.student.deleteMany({
+      where: {
+        school: {
+          id: {
+            in: id,
+          },
+        },
+      },
+    });
+    await this.prisma.user.deleteMany({
+      where: {
+        school: {
+          id: {
+            in: id,
+          },
+        },
+      },
+    });
+    await this.prisma.school.deleteMany({
+      where: {
+        id: {
+          in: id,
+        },
+      },
+    });
+
+    return 'ok';
   }
 
   async updateSchool(id: string, data: Prisma.SchoolUpdateInput) {
@@ -42,7 +68,7 @@ export class SchoolService {
 
   async getAll() {
     const result = await this.prisma.school.findMany();
-    if (result === null) {
+    if (result.length === 0) {
       throw new NotFoundException(`No schools found`);
     }
     return result;

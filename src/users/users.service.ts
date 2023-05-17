@@ -25,7 +25,8 @@ export class UsersService {
     const user = await this.prisma.user.findFirst({
       where: { login: username },
     });
-    if (user === null) {
+    if (user == null) {
+      return null;
       throw new NotFoundException(`User with login ${username} is not found`);
     }
     return user;
@@ -53,16 +54,23 @@ export class UsersService {
   }
 
   async getAllUsers() {
-    return this.prisma.user.findMany();
+    // return this.prisma.user.findMany({ include: { school: true } });
+    return this.prisma.user.findMany({ include: { school: true } });
   }
 
-  async updateUser(username: string, data: Prisma.UserUpdateInput) {
-    const user: User = await this.findByLogin(username);
+  async updateUser(id: string, data: Prisma.UserUpdateInput) {
+    console.log('data: ', data);
+    const user: User = await this.findById(id);
     return await this.prisma.user.update({
       where: { id: user.id },
       data,
     });
   }
+
+  async deleteMany(id: string[]) {
+    return await this.prisma.user.deleteMany({ where: { id: { in: id } } });
+  }
+
   async deleteUser(username: string) {
     const user: User = await this.findByLogin(username);
     return await this.prisma.user.delete({ where: { id: user.id } });

@@ -11,11 +11,6 @@ export class AdminGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext) {
-    const isAdmin = this.reflector.get<boolean>(
-      'isAdmin',
-      context.getHandler(),
-    );
-
     const request = context.switchToHttp().getRequest();
     const userId = request.user.id;
     const user: User = await this.usersService.findById(userId);

@@ -7,18 +7,20 @@ import {
   Get,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { SchoolService } from './school.service';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { UpdateSchoolDto } from './dto/update-school.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { Admin } from 'src/auth/admin.decorator';
+import { DeleteSchoolDto } from './dto/delete-school-dto';
 
 @Controller('/api/school')
 export class SchoolController {
   constructor(private readonly schoolService: SchoolService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Admin()
   @Post('create')
   async create(@Body() createSchoolDto: CreateSchoolDto) {
@@ -28,7 +30,7 @@ export class SchoolController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Admin()
   @Put(':id')
   async update(
@@ -38,22 +40,26 @@ export class SchoolController {
     return await this.schoolService.updateSchool(id, updateSchoolDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Get(':id')
   async get(@Param('id') id: string) {
     return await this.schoolService.findSchool(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Get()
-  async getAll() {
-    return await this.schoolService.getAll();
+  async getAll(@Request() req) {
+    if (req.user.isAdmin === true) {
+      return await this.schoolService.getAll();
+    } else {
+      return [req.user.school];
+    }
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Admin()
   @Delete(':id')
-  async deleteOne(@Param('id') id: string) {
-    return await this.schoolService.deleteSchool(id);
+  async deleteOne(@Body() deleteSchoolDto: DeleteSchoolDto) {
+    return await this.schoolService.deleteSchool(deleteSchoolDto.ids);
   }
 }

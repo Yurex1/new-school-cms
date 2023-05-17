@@ -6,43 +6,40 @@ import {
   Body,
   Get,
   Request,
-  ExecutionContext,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user-dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { Admin } from 'src/auth/admin.decorator';
+import { DeleteUserDto } from './dto/delete-user-dto';
 
 @Controller('/api/users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Admin()
   @Put(':id')
-  async update(
-    @Param('id') userLogin: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return await this.userService.updateUser(userLogin, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return await this.userService.updateUser(id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Admin()
-  @Delete(':id')
-  async delete(@Param('id') userLogin: string) {
-    console.log('delete');
-    return await this.userService.deleteUser(userLogin);
+  @Delete()
+  delete(@Body() deleteUserDto: DeleteUserDto) {
+    console.log('Array: ', Array.isArray(deleteUserDto.ids));
+    return this.userService.deleteMany(deleteUserDto.ids);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Get('me')
   getProfile(@Request() req) {
     return req.user;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Get()
   async getAllUsers() {
     return this.userService.getAllUsers();

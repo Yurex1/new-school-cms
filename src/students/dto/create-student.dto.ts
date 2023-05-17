@@ -1,4 +1,11 @@
-import { IsDate, IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
+import {
+  IsDate,
+  IsISO8601,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  Length,
+} from 'class-validator';
 
 export class CreateStudentDto {
   @IsString()
@@ -9,11 +16,7 @@ export class CreateStudentDto {
   @IsNotEmpty()
   locationOfLiving: string;
 
-  @IsString()
-  @IsNotEmpty()
-  locationOfStudy: string;
-
-  @IsDate()
+  @IsISO8601()
   @IsNotEmpty()
   dateOfBirth: Date;
 
@@ -23,7 +26,7 @@ export class CreateStudentDto {
 
   @IsString()
   @IsNotEmpty()
-  @Length(4, 6)
+  @Length(6, 8)
   sex: string;
 
   @IsString()
@@ -32,6 +35,5 @@ export class CreateStudentDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsUUID()
   schoolId: string;
 }

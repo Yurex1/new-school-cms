@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 export class StudentsService {
   constructor(private prisma: PrismaService) {}
   async createOne(data: Prisma.StudentCreateInput) {
+    data.dateOfBirth = new Date(data.dateOfBirth);
     const result = this.prisma.student.create({
       data,
     });
@@ -27,15 +28,14 @@ export class StudentsService {
     return result;
   }
 
-  async deleteOne(id: string) {
-    await this.findOne(id);
-    return await this.prisma.student.delete({
-      where: { id: id },
-    });
+  async deleteMany(id: string[]) {
+    return await this.prisma.student.deleteMany({ where: { id: { in: id } } });
   }
   async getAll() {
-    const result = this.prisma.student.findMany();
-    if (result === null) {
+    const result = await this.prisma.student.findMany({
+      include: { school: true },
+    });
+    if (result.length === 0) {
       throw new NotFoundException(`Students not found`);
     }
     return result;
