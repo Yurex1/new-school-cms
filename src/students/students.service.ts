@@ -33,9 +33,7 @@ export class StudentsService {
     return await this.prisma.student.deleteMany({ where: { id: { in: id } } });
   }
   async getAll() {
-    const result = await this.prisma.student.findMany({
-      include: { school: true },
-    });
+    const result = await this.prisma.student.findMany();
     if (result.length === 0) {
       throw new NotFoundException(`Students not found`);
     }

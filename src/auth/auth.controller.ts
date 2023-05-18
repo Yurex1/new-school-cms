@@ -44,6 +44,7 @@ export class AuthController {
     return res.json(result);
   }
 
+  @Admin()
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return await this.authService.register(
