@@ -29,6 +29,17 @@ export class StudentsService {
     return result;
   }
 
+  async getStudentsBySchoolId(schoolId) {
+    const result = await this.prisma.student.findMany({
+      where: { schoolId: schoolId },
+    });
+    console.log('1', result);
+    if (result.length === 0) {
+      throw new NotFoundException(`Students not found`);
+    }
+    return result;
+  }
+
   async deleteMany(id: string[]) {
     return await this.prisma.student.deleteMany({ where: { id: { in: id } } });
   }

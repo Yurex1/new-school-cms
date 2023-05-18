@@ -57,7 +57,7 @@ export class SchoolController {
     if (user.isAdmin === true) {
       return await this.schoolService.getAll();
     } else {
-      return [this.schoolService.findSchool(user.schoolId)];
+      return [await this.schoolService.findSchool(user.schoolId)];
     }
   }
 

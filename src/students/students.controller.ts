@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -15,10 +16,14 @@ import { Admin } from 'src/auth/admin.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { DeleteStudentDto } from './dto/delete-student.dto';
 import { type } from 'os';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('/api/students')
 export class StudentsController {
-  constructor(private readonly studentsService: StudentsService) {}
+  constructor(
+    private readonly studentsService: StudentsService,
+    private readonly userService: UsersService,
+  ) {}
 
   @UseGuards(AuthGuard)
   @Admin()
@@ -56,7 +61,16 @@ export class StudentsController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async getAll() {
-    return await this.studentsService.getAll();
+  async getAll(@Request() req) {
+    const user = await this.userService.findById(req.user.id);
+    if (user.isAdmin === true) {
+      return await this.studentsService.getAll();
+    } else {
+      console.log(
+        '2',
+        await this.studentsService.getStudentsBySchoolId(user.schoolId),
+      );
+      return await this.studentsService.getStudentsBySchoolId(user.schoolId);
+    }
   }
 }
