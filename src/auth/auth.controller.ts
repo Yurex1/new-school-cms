@@ -15,10 +15,9 @@ import { LocalAuthGuard } from './local-auth.guard';
 import { SignInUserDto } from './dto/signIn-user-dto';
 import { AuthService } from './auth.service';
 import { Admin } from './admin.decorator';
-import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from './admin.guard';
 import { type } from 'os';
 
-// @Controller('/api/auth')
 @Controller('/api/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -44,7 +43,7 @@ export class AuthController {
     return res.json(result);
   }
 
-  @Admin()
+  @UseGuards(AdminGuard)
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return await this.authService.register(

@@ -12,10 +12,6 @@ export class LocalAuthGuard extends AuthGuard('local') {
     const request = context.switchToHttp().getRequest();
     const { login, password } = request.body;
 
-    // Log the request and its body
-
-    // You can perform additional checks or actions here
-
     return user;
   }
 }
