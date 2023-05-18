@@ -45,7 +45,6 @@ export class StudentsController {
   @UseGuards(AuthGuard)
   @Delete()
   delete(@Body() deleteStudentDto: DeleteStudentDto) {
-    console.log('Array: ', Array.isArray(deleteStudentDto.ids));
     return this.studentsService.deleteMany(deleteStudentDto.ids);
   }
 

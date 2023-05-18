@@ -15,14 +15,18 @@ import { UpdateSchoolDto } from './dto/update-school.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Admin } from 'src/auth/admin.decorator';
 import { DeleteSchoolDto } from './dto/delete-school-dto';
+import { UsersService } from '../users/users.service';
 
 @Controller('/api/school')
 export class SchoolController {
-  constructor(private readonly schoolService: SchoolService) {}
+  constructor(
+    private readonly schoolService: SchoolService,
+    private readonly userService: UsersService,
+  ) {}
 
   @UseGuards(AuthGuard)
   @Admin()
-  @Post('create')
+  @Post()
   async create(@Body() createSchoolDto: CreateSchoolDto) {
     return await this.schoolService.createSchool(
       createSchoolDto.name,
@@ -49,10 +53,11 @@ export class SchoolController {
   @UseGuards(AuthGuard)
   @Get()
   async getAll(@Request() req) {
-    if (req.user.isAdmin === true) {
+    const user = await this.userService.findById(req.user.id);
+    if (user.isAdmin === true) {
       return await this.schoolService.getAll();
     } else {
-      return [req.user.school];
+      return [this.schoolService.findSchool(user.schoolId)];
     }
   }
 

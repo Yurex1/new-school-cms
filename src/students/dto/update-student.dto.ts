@@ -1,6 +1,13 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateStudentDto } from './create-student.dto';
-import { IsString, IsNotEmpty, IsDate, Length, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDate,
+  Length,
+  IsUUID,
+  IsDateString,
+} from 'class-validator';
 
 export class UpdateStudentDto extends PartialType(CreateStudentDto) {
   @IsString()
@@ -13,9 +20,9 @@ export class UpdateStudentDto extends PartialType(CreateStudentDto) {
 
   @IsString()
   @IsNotEmpty()
-  locationOfStudy: string;
+  schoolId: string;
 
-  @IsDate()
+  @IsDateString()
   @IsNotEmpty()
   dateOfBirth: Date;
 
@@ -25,15 +32,14 @@ export class UpdateStudentDto extends PartialType(CreateStudentDto) {
 
   @IsString()
   @IsNotEmpty()
-  @Length(4, 6)
+  @Length(6, 8)
   sex: string;
 
   @IsString()
   @IsNotEmpty()
   formOfStudy: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @IsUUID()
-  schoolId: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // schoolId: string;
 }

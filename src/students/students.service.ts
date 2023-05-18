@@ -14,6 +14,7 @@ export class StudentsService {
   }
   async updateOne(id: string, data: Prisma.StudentUpdateInput) {
     await this.findOne(id);
+    data.dateOfBirth = new Date(data.dateOfBirth.toString());
     return await this.prisma.student.update({
       where: { id },
       data: data,

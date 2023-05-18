@@ -48,7 +48,7 @@ model Student {
 
   locationOfLiving String
 
-  dateOfBirth DateTime @db.Timestamp()
+  dateOfBirth DateTime @db.Date()
 
   specialCategory String
 

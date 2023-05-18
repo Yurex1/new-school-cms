@@ -29,14 +29,14 @@ export class UsersController {
   @Admin()
   @Delete()
   delete(@Body() deleteUserDto: DeleteUserDto) {
-    console.log('Array: ', Array.isArray(deleteUserDto.ids));
     return this.userService.deleteMany(deleteUserDto.ids);
   }
 
   @UseGuards(AuthGuard)
   @Get('me')
-  getProfile(@Request() req) {
-    return req.user;
+  async getProfile(@Request() req) {
+    const user = await this.userService.findById(req.user.id);
+    return user;
   }
 
   @UseGuards(AuthGuard)
