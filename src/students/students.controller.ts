@@ -66,10 +66,6 @@ export class StudentsController {
     if (user.isAdmin === true) {
       return await this.studentsService.getAll();
     } else {
-      console.log(
-        '2',
-        await this.studentsService.getStudentsBySchoolId(user.schoolId),
-      );
       return await this.studentsService.getStudentsBySchoolId(user.schoolId);
     }
   }
