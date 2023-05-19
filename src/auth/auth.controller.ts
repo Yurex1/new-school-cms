@@ -30,7 +30,6 @@ export class AuthController {
       signInDto.login,
       signInDto.password,
     );
-    console.log('password', result);
 
     if (result instanceof NotFoundException) {
       const error = { user: 'user not found', statusCode: 404 };

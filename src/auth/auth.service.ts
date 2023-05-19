@@ -51,7 +51,6 @@ export class AuthService {
     isAdmin: boolean,
     schoolId: string,
   ) {
-    console.log('pass', password);
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.usersService.createOne({
       login: login,
