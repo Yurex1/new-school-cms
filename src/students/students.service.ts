@@ -22,7 +22,10 @@ export class StudentsService {
   }
 
   async findOne(id: string) {
-    const result = await this.prisma.student.findUnique({ where: { id: id } });
+    const result = await this.prisma.student.findUnique({
+      where: { id: id },
+      include: { school: true },
+    });
     if (result === null) {
       throw new NotFoundException(`Student with ID ${id} not found`);
     }
