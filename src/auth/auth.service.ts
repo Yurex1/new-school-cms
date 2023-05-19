@@ -31,7 +31,7 @@ export class AuthService {
     if (user == null) {
       return new NotFoundException('user not found');
     }
-    if (await bcrypt.compare(user.password, pass)) {
+    if (!(await bcrypt.compare(pass, user.password))) {
       throw new UnauthorizedException();
     }
     const payload = {
@@ -51,9 +51,11 @@ export class AuthService {
     isAdmin: boolean,
     schoolId: string,
   ) {
+    console.log('pass', password);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.usersService.createOne({
       login: login,
-      password: await bcrypt.hash(password, 10),
+      password: hashedPassword,
       name: username,
       isAdmin: isAdmin,
       school: { connect: { id: schoolId } },

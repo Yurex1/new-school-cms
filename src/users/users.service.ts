@@ -21,13 +21,13 @@ export class UsersService {
     return user;
   }
 
-  async findByLogin(username: string): Promise<User | null> {
+  async findByLogin(login: string): Promise<User | null> {
     const user = await this.prisma.user.findFirst({
-      where: { login: username },
+      where: { login: login },
     });
     if (user == null) {
       return null;
-      throw new NotFoundException(`User with login ${username} is not found`);
+      throw new NotFoundException(`User with login ${login} is not found`);
     }
     return user;
   }

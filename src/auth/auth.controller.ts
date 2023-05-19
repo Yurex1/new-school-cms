@@ -25,15 +25,12 @@ export class AuthController {
   // @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async signIn(
-    @Body() signInDto: SignInUserDto,
-    @Res() res: Response,
-    @Request() req,
-  ) {
+  async signIn(@Body() signInDto: SignInUserDto, @Res() res: Response) {
     const result = await this.authService.signIn(
       signInDto.login,
       signInDto.password,
     );
+    console.log('password', result);
 
     if (result instanceof NotFoundException) {
       const error = { user: 'user not found' };
@@ -43,7 +40,7 @@ export class AuthController {
     return res.json(result);
   }
 
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return await this.authService.register(
