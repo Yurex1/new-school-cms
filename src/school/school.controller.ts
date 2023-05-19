@@ -16,6 +16,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Admin } from 'src/auth/admin.decorator';
 import { DeleteSchoolDto } from './dto/delete-school-dto';
 import { UsersService } from '../users/users.service';
+import { AdminGuard } from 'src/auth/admin.guard';
 
 @Controller('/api/school')
 export class SchoolController {
@@ -25,7 +26,7 @@ export class SchoolController {
   ) {}
 
   @UseGuards(AuthGuard)
-  @Admin()
+  @UseGuards(AdminGuard)
   @Post()
   async create(@Body() createSchoolDto: CreateSchoolDto) {
     return await this.schoolService.createSchool(
@@ -35,7 +36,7 @@ export class SchoolController {
   }
 
   @UseGuards(AuthGuard)
-  @Admin()
+  @UseGuards(AdminGuard)
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -62,7 +63,7 @@ export class SchoolController {
   }
 
   @UseGuards(AuthGuard)
-  @Admin()
+  @UseGuards(AdminGuard)
   @Delete(':id')
   async deleteOne(@Body() deleteSchoolDto: DeleteSchoolDto) {
     return await this.schoolService.deleteSchool(deleteSchoolDto.ids);

@@ -13,20 +13,21 @@ import { UpdateUserDto } from './dto/update-user-dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Admin } from 'src/auth/admin.decorator';
 import { DeleteUserDto } from './dto/delete-user-dto';
+import { AdminGuard } from 'src/auth/admin.guard';
 
 @Controller('/api/users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @UseGuards(AuthGuard)
-  @Admin()
+  @UseGuards(AdminGuard)
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.userService.updateUser(id, updateUserDto);
   }
 
   @UseGuards(AuthGuard)
-  @Admin()
+  @UseGuards(AdminGuard)
   @Delete()
   delete(@Body() deleteUserDto: DeleteUserDto) {
     return this.userService.deleteMany(deleteUserDto.ids);

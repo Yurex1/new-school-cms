@@ -26,7 +26,6 @@ export class StudentsController {
   ) {}
 
   @UseGuards(AuthGuard)
-  @Admin()
   @Post()
   create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentsService.createOne({
@@ -41,7 +40,6 @@ export class StudentsController {
   }
 
   @UseGuards(AuthGuard)
-  @Admin()
   @Put(':id')
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentsService.updateOne(id, updateStudentDto);

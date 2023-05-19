@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma.service';
 import { User } from '@prisma/client';
 import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 import { NEVER, never } from 'rxjs';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -60,6 +61,7 @@ export class UsersService {
 
   async updateUser(id: string, data: Prisma.UserUpdateInput) {
     const user: User = await this.findById(id);
+    data.password = await bcrypt.hash(data.password.toString(), 10);
     return await this.prisma.user.update({
       where: { id: user.id },
       data,

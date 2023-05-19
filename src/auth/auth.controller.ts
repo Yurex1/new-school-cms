@@ -33,7 +33,7 @@ export class AuthController {
     console.log('password', result);
 
     if (result instanceof NotFoundException) {
-      const error = { user: 'user not found' };
+      const error = { user: 'user not found', statusCode: 404 };
       return res.status(404).json(error);
     }
     // return result;
