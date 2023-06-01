@@ -48,7 +48,6 @@ export class StudentsController {
   @UseGuards(AuthGuard)
   @Delete()
   delete(@Body() deleteStudentDto: DeleteStudentDto) {
-    // console.log('cookies: ', request.cookies);
     return this.studentsService.deleteMany(deleteStudentDto.ids);
   }
 

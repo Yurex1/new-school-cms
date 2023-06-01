@@ -22,7 +22,7 @@ import { type } from 'os';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async signIn(@Body() signInDto: SignInUserDto, @Res() res: Response) {
@@ -39,7 +39,7 @@ export class AuthController {
     return res.json(result);
   }
 
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return await this.authService.register(

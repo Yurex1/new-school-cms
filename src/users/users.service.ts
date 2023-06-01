@@ -44,7 +44,6 @@ export class UsersService {
       },
     });
     if (user === null) {
-      console.log('data: ', data.school);
       const user = await this.prisma.user.create({
         include: {
           school: true,
@@ -58,7 +57,6 @@ export class UsersService {
           },
         },
       });
-      console.log('rr', user);
       return user;
     } else {
       throw new ConflictException(

@@ -60,7 +60,6 @@ export class AuthService {
       school: { connect: { id: schoolId } },
     });
 
-    console.log('suer', user);
     return user;
   }
 }
