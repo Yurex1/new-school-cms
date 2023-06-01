@@ -44,9 +44,22 @@ export class UsersService {
       },
     });
     if (user === null) {
-      return await this.prisma.user.create({
-        data,
+      console.log('data: ', data.school);
+      const user = await this.prisma.user.create({
+        include: {
+          school: true,
+        },
+        data: {
+          ...data,
+          school: {
+            connect: {
+              id: data.school.connect.id,
+            },
+          },
+        },
       });
+      console.log('rr', user);
+      return user;
     } else {
       throw new ConflictException(
         `User with the same login ${data.login} has already been created`,

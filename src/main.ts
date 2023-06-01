@@ -4,6 +4,9 @@ import { AppModule } from './app.module';
 
 import * as session from 'express-session';
 import { ValidationPipe } from '@nestjs/common';
+
+import * as cookieParser from 'cookie-parser';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(new ValidationPipe());
@@ -12,6 +15,7 @@ async function bootstrap() {
   // somewhere in your initialization file
 
   app.use(
+    cookieParser(),
     session({
       secret: 'my-secret',
 
@@ -19,5 +23,6 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
+  // app.use(cookieParser());
 }
 bootstrap();
