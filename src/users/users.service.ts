@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -14,7 +15,7 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string) {
     const user = await this.prisma.user.findFirst({ where: { id } });
     if (user === null) {
       throw new NotFoundException(`User ${user} is not found`);
@@ -22,12 +23,11 @@ export class UsersService {
     return user;
   }
 
-  async findByLogin(login: string): Promise<User | null> {
+  async findByLogin(login: string) {
     const user = await this.prisma.user.findFirst({
       where: { login: login },
     });
     if (user == null) {
-      return null;
       throw new NotFoundException(`User with login ${login} is not found`);
     }
     return user;
@@ -43,31 +43,36 @@ export class UsersService {
         login: data.login,
       },
     });
-    if (user === null) {
+    if (user) {
+      throw new ConflictException(
+        `User with login ${data.login} already exists`,
+      );
+    }
+    try {
       const user = await this.prisma.user.create({
-        include: {
-          school: true,
-        },
+        include: { school: true },
         data: {
           ...data,
           school: {
-            connect: {
-              id: data.school.connect.id,
-            },
+            connect: { id: data.school.connect.id },
           },
         },
       });
       return user;
-    } else {
-      throw new ConflictException(
-        `User with the same login ${data.login} has already been created`,
-      );
+    } catch (error) {
+      throw new BadRequestException(`Failed to create user: ${error.message}`);
     }
   }
 
   async getAllUsers() {
-    // return this.prisma.user.findMany({ include: { school: true } });
-    return this.prisma.user.findMany({ include: { school: true } });
+    //return this.prisma.user.findMany({ include: { school: true } });
+    const users = await this.prisma.user.findMany({
+      include: { school: true },
+    });
+    if (!users.length) {
+      throw new NotFoundException('No users found');
+    }
+    return users;
   }
 
   async updateUser(id: string, data: Prisma.UserUpdateInput) {
@@ -79,12 +84,24 @@ export class UsersService {
     });
   }
 
-  async deleteMany(id: string[]) {
-    return await this.prisma.user.deleteMany({ where: { id: { in: id } } });
+  async deleteMany(ids: string[]) {
+    // return await this.prisma.user.deleteMany({ where: { id: { in: ids } } });
+    try {
+      return await this.prisma.user.deleteMany({ where: { id: { in: ids } } });
+    } catch (error) {
+      throw new BadRequestException(`Failed to delete users: ${error.message}`);
+    }
   }
 
   async deleteUser(username: string) {
-    const user: User = await this.findByLogin(username);
-    return await this.prisma.user.delete({ where: { id: user.id } });
+    const user = await this.findByLogin(username);
+    if (!user) {
+      throw new NotFoundException(`User with login ${username} not found`);
+    }
+    try {
+      return await this.prisma.user.delete({ where: { id: user.id } });
+    } catch (error) {
+      throw new BadRequestException(`Failed to delete user: ${error.message}`);
+    }
   }
 }

@@ -12,10 +12,8 @@ import {
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { Admin } from 'src/auth/admin.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { DeleteStudentDto } from './dto/delete-student.dto';
-import { type } from 'os';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('/api/students')

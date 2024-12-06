@@ -8,8 +8,6 @@ import {
   Delete,
   UseGuards,
   Request,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { SchoolService } from './school.service';
 import { CreateSchoolDto } from './dto/create-school.dto';
@@ -29,17 +27,10 @@ export class SchoolController {
   @UseGuards(AuthGuard, AdminGuard)
   @Post()
   async create(@Body() createSchoolDto: CreateSchoolDto) {
-    try {
-      return await this.schoolService.createSchool(
-        createSchoolDto.name,
-        createSchoolDto.type,
-      );
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.schoolService.createSchool(
+      createSchoolDto.name,
+      createSchoolDto.type,
+    );
   }
 
   @UseGuards(AuthGuard, AdminGuard)
@@ -48,56 +39,29 @@ export class SchoolController {
     @Param('id') id: string,
     @Body() updateSchoolDto: UpdateSchoolDto,
   ) {
-    try {
-      return await this.schoolService.updateSchool(id, updateSchoolDto);
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.schoolService.updateSchool(id, updateSchoolDto);
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
   async get(@Param('id') id: string) {
-    try {
-      return await this.schoolService.findSchool(id);
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.schoolService.findSchool(id);
   }
 
   @UseGuards(AuthGuard)
   @Get()
   async getAll(@Request() req) {
-    try {
-      const user = await this.userService.findById(req.user.id);
-      if (user.isAdmin) {
-        return await this.schoolService.getAll();
-      }
+    const user = await this.userService.findById(req.user.id);
+    if (user.isAdmin === true) {
+      return await this.schoolService.getAll();
+    } else {
       return [await this.schoolService.findSchool(user.schoolId)];
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 
   @UseGuards(AuthGuard, AdminGuard)
   @Delete(':id')
   async deleteOne(@Body() deleteSchoolDto: DeleteSchoolDto) {
-    try {
-      return await this.schoolService.deleteSchool(deleteSchoolDto.ids);
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.schoolService.deleteSchool(deleteSchoolDto.ids);
   }
 }
