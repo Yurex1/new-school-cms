@@ -35,11 +35,9 @@ export class AuthController {
       const error = { user: 'user not found', statusCode: 404 };
       return res.status(404).json(error);
     }
-    // return result;
     return res.json(result);
   }
 
-  @UseGuards(AdminGuard)
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return await this.authService.register(
