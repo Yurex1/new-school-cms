@@ -36,7 +36,6 @@ export class AdminGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    // Check if the user is an admin
     const userId = request.user.id;
     const user: User = await this.usersService.findById(userId);
     if (!user.isAdmin) {
