@@ -41,7 +41,7 @@ export class AdminGuard implements CanActivate {
     console.log('user', user);
     if (!user.isAdmin) {
       throw new UnauthorizedException(
-        "You don't have permission to create a school",
+        "You don't have permission to access this resource",
       );
     }
 

@@ -35,6 +35,7 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('me')
   async getProfile(@Req() req: Request) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     return await this.userService.findById(req.user.id);
   }

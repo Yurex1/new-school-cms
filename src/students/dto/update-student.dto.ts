@@ -32,7 +32,7 @@ export class UpdateStudentDto extends PartialType(CreateStudentDto) {
 
   @IsString()
   @IsNotEmpty()
-  @Length(6, 8)
+  // @Length(6, 8)
   sex: string;
 
   @IsString()
