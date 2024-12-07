@@ -23,7 +23,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async signIn(@Body() signInDto: SignInUserDto, @Res() res: Response) {
-    return await this.authService.signIn(signInDto.login, signInDto.password);
+    const result = await this.authService.signIn(
+      signInDto.login,
+      signInDto.password,
+    );
+
+    return res.json(result);
   }
 
   @Post('register')

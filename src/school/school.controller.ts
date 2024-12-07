@@ -60,7 +60,7 @@ export class SchoolController {
   }
 
   @UseGuards(AuthGuard, AdminGuard)
-  @Delete(':id')
+  @Delete()
   async deleteOne(@Body() deleteSchoolDto: DeleteSchoolDto) {
     return await this.schoolService.deleteSchool(deleteSchoolDto.ids);
   }

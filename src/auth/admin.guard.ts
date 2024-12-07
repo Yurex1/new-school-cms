@@ -38,8 +38,11 @@ export class AdminGuard implements CanActivate {
 
     const userId = request.user.id;
     const user: User = await this.usersService.findById(userId);
+    console.log('user', user);
     if (!user.isAdmin) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(
+        "You don't have permission to create a school",
+      );
     }
 
     return true;

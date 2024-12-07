@@ -44,7 +44,7 @@ export class AuthService {
       const payload = { id: user.id };
       return {
         success: true,
-        token: `Bearer ${this.jwtService.sign(payload)}`,
+        token: `Bearer ${this.jwtService.sign(payload, { expiresIn: '1h' })}`,
       };
     } catch (error) {
       throw new InternalServerErrorException(
