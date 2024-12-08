@@ -10,12 +10,14 @@ import {
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private prismaService: PrismaService,
   ) {}
 
   async validateUser(username: string, password: string): Promise<User | null> {
@@ -42,14 +44,48 @@ export class AuthService {
         throw new UnauthorizedException('Invalid credentials');
       }
       const payload = { id: user.id };
+      const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+      const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+      await this.prismaService.user.update({
+        where: { id: user.id },
+        data: { refreshToken: refreshToken },
+      });
       return {
         success: true,
-        token: `Bearer ${this.jwtService.sign(payload, { expiresIn: '1h' })}`,
+        accessToken: `${accessToken}`,
+        refreshToken: `${refreshToken}`,
       };
     } catch (error) {
       throw new InternalServerErrorException(
         `Failed to sign in: ${error.message}`,
       );
+    }
+  }
+
+  async refreshTokens(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+      const user = await this.usersService.findById(payload.id);
+
+      if (!user || user.refreshToken !== refreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const newAccessToken = this.jwtService.sign(
+        { id: user.id },
+        { expiresIn: '15m' },
+      );
+      const newRefreshToken = this.jwtService.sign(
+        { id: user.id },
+        { expiresIn: '7d' },
+      );
+
+      await this.usersService.updateUserRefreshToken(user.id, newRefreshToken);
+
+      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
     }
   }
 

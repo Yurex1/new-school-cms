@@ -37,6 +37,13 @@ export class UsersService {
   //   return this.users.find((user) => user.username === username);
   // }
 
+  async updateUserRefreshToken(userId: string, refreshToken: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken },
+    });
+  }
+
   async createOne(data: Prisma.UserCreateInput) {
     const user = await this.prisma.user.findFirst({
       where: {

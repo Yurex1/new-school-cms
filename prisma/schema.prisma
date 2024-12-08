@@ -23,6 +23,8 @@ model User {
 
   schoolId String
 
+  refreshToken String?
+
   dateCreated DateTime @default(now())
 }
 
@@ -56,5 +58,13 @@ model Student {
   school School @relation(fields: [schoolId], references: [id])
 
   schoolId String
+}
+model Log {
+  id        Int      @id @default(autoincrement())
+  method    String
+  path      String
+  status    Int
+  timestamp DateTime @default(now())
+  userAgent String?
 }
 

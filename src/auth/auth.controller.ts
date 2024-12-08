@@ -7,6 +7,7 @@ import {
   Post,
   Request,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -27,7 +28,6 @@ export class AuthController {
       signInDto.login,
       signInDto.password,
     );
-
     return res.json(result);
   }
 
@@ -40,5 +40,13 @@ export class AuthController {
       registerUserDto.isAdmin,
       registerUserDto.schoolId,
     );
+  }
+
+  @Post('refresh')
+  async refreshTokens(@Body() body: { refreshToken: string }) {
+    if (!body.refreshToken) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
+    return await this.authService.refreshTokens(body.refreshToken);
   }
 }
