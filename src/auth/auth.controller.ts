@@ -7,6 +7,7 @@ import {
   Post,
   Request,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -14,9 +15,6 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 import { SignInUserDto } from './dto/signIn-user-dto';
 import { AuthService } from './auth.service';
-import { Admin } from './admin.decorator';
-import { AdminGuard } from './admin.guard';
-import { type } from 'os';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -30,16 +28,9 @@ export class AuthController {
       signInDto.login,
       signInDto.password,
     );
-
-    if (result instanceof NotFoundException) {
-      const error = { user: 'user not found', statusCode: 404 };
-      return res.status(404).json(error);
-    }
-    // return result;
     return res.json(result);
   }
 
-  @UseGuards(AdminGuard)
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return await this.authService.register(
@@ -49,5 +40,13 @@ export class AuthController {
       registerUserDto.isAdmin,
       registerUserDto.schoolId,
     );
+  }
+
+  @Post('refresh')
+  async refreshTokens(@Body() body: { refreshToken: string }) {
+    if (!body.refreshToken) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
+    return await this.authService.refreshTokens(body.refreshToken);
   }
 }

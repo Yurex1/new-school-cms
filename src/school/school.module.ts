@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { UsersService } from 'src/users/users.service';
 
 @Module({
+  imports: [],
   controllers: [SchoolController],
   providers: [SchoolService, PrismaService, UsersService],
 })

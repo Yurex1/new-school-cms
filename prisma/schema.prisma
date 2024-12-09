@@ -1,14 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+}
 
 generator client {
   provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-
-  url = env("DATABASE_URL")
 }
 
 model User {
@@ -26,13 +23,15 @@ model User {
 
   schoolId String
 
+  refreshToken String?
+
   dateCreated DateTime @default(now())
 }
 
 model School {
   id String @id @default(cuid())
 
-  name String
+  name String @unique
 
   type String
 
@@ -60,3 +59,12 @@ model Student {
 
   schoolId String
 }
+model Log {
+  id        Int      @id @default(autoincrement())
+  method    String
+  path      String
+  status    Int
+  timestamp DateTime @default(now())
+  userAgent String?
+}
+

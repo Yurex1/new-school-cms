@@ -12,11 +12,11 @@ import {
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { Admin } from 'src/auth/admin.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { DeleteStudentDto } from './dto/delete-student.dto';
-import { type } from 'os';
 import { UsersService } from 'src/users/users.service';
+import { Admin } from 'src/auth/admin.decorator';
+import { AdminGuard } from 'src/auth/admin.guard';
 
 @Controller('/api/students')
 export class StudentsController {
@@ -25,7 +25,7 @@ export class StudentsController {
     private readonly userService: UsersService,
   ) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @Post()
   create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentsService.createOne({
@@ -39,13 +39,13 @@ export class StudentsController {
     });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @Put(':id')
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentsService.updateOne(id, updateStudentDto);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @Delete()
   delete(@Body() deleteStudentDto: DeleteStudentDto) {
     return this.studentsService.deleteMany(deleteStudentDto.ids);

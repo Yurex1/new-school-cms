@@ -11,40 +11,38 @@ import {
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { Admin } from 'src/auth/admin.decorator';
-import { DeleteUserDto } from './dto/delete-user-dto';
 import { AdminGuard } from 'src/auth/admin.guard';
+import { DeleteUserDto } from './dto/delete-user-dto';
 import { Request } from 'express';
 
 @Controller('/api/users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @UseGuards(AuthGuard)
-  @UseGuards(AdminGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.userService.updateUser(id, updateUserDto);
   }
 
-  @UseGuards(AuthGuard)
-  @UseGuards(AdminGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @Delete()
-  delete(@Body() deleteUserDto: DeleteUserDto, @Req() req: Request) {
-    console.log('cookies: ', req.cookies);
-    return this.userService.deleteMany(deleteUserDto.ids);
+  async delete(@Body() deleteUserDto: DeleteUserDto, @Req() req: Request) {
+    // console.log('Cookies:', req.cookies);
+    return await this.userService.deleteMany(deleteUserDto.ids);
   }
 
   @UseGuards(AuthGuard)
   @Get('me')
-  async getProfile(@Req() req) {
-    const user = await this.userService.findById(req.user.id);
-    return user;
+  async getProfile(@Req() req: Request) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    return await this.userService.findById(req.user.id);
   }
 
   @UseGuards(AuthGuard)
   @Get()
   async getAllUsers() {
-    return this.userService.getAllUsers();
+    return await this.userService.getAllUsers();
   }
 }

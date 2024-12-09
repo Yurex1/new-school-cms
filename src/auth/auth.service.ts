@@ -1,47 +1,82 @@
 import * as bcrypt from 'bcrypt';
-
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-// import { ConfigService } from '@nestjs/config';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService, // private configService: ConfigService,
+    private jwtService: JwtService,
+    private prismaService: PrismaService,
   ) {}
 
   async validateUser(username: string, password: string): Promise<User | null> {
-    const user = await this.usersService.findByLogin(username);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      return user;
+    try {
+      const user = await this.usersService.findByLogin(username);
+      if (user && (await bcrypt.compare(password, user.password))) {
+        return user;
+      }
+      return null;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to validate user: ${error.message}`,
+      );
     }
-    return null;
   }
 
-  async signIn(username, pass) {
+  async signIn(username: string, pass: string) {
     const user = await this.usersService.findByLogin(username);
-    if (user == null) {
-      return new NotFoundException('user not found');
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
     if (!(await bcrypt.compare(pass, user.password))) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = {
-      id: user.id,
-    };
+    const payload = { id: user.id };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
+    await this.prismaService.user.update({
+      where: { id: user.id },
+      data: { refreshToken: refreshToken },
+    });
     return {
       success: true,
-      token: `Bearer ${this.jwtService.sign(payload)}`,
+      accessToken: `${accessToken}`,
+      refreshToken: `${refreshToken}`,
     };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    const payload = this.jwtService.verify(refreshToken);
+    const user = await this.usersService.findById(payload.id);
+
+    if (!user || user.refreshToken !== refreshToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const newAccessToken = this.jwtService.sign(
+      { id: user.id },
+      { expiresIn: '15m' },
+    );
+    const newRefreshToken = this.jwtService.sign(
+      { id: user.id },
+      { expiresIn: '7d' },
+    );
+
+    await this.usersService.updateUserRefreshToken(user.id, newRefreshToken);
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
 
   async register(
@@ -51,15 +86,22 @@ export class AuthService {
     isAdmin: boolean,
     schoolId: string,
   ) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await this.usersService.createOne({
-      login: login,
-      password: hashedPassword,
-      name: username,
-      isAdmin: isAdmin,
-      school: { connect: { id: schoolId } },
-    });
-
-    return user;
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      return this.usersService.createOne({
+        login,
+        password: hashedPassword,
+        name: username,
+        isAdmin,
+        school: { connect: { id: schoolId } },
+      });
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw new ConflictException(error.message);
+      }
+      throw new InternalServerErrorException(
+        `Failed to register user: ${error.message}`,
+      );
+    }
   }
 }
