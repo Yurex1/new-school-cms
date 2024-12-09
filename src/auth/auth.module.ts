@@ -9,6 +9,7 @@ import { UsersModule } from 'src/users/users.module';
 // import { ConfigService } from '@nestjs/config';
 import { jwtConstants } from './constants';
 import { AdminGuard } from './admin.guard';
+import { PrismaService } from 'src/prisma.service';
 
 @Module({
   imports: [
@@ -20,7 +21,13 @@ import { AdminGuard } from './admin.guard';
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, AdminGuard],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    AdminGuard,
+    PrismaService,
+  ],
   controllers: [AuthController],
   exports: [AuthService, PassportModule, JwtModule],
 })

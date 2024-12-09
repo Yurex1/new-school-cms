@@ -35,58 +35,48 @@ export class AuthService {
   }
 
   async signIn(username: string, pass: string) {
-    try {
-      const user = await this.usersService.findByLogin(username);
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-      if (!(await bcrypt.compare(pass, user.password))) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
-      const payload = { id: user.id };
-      const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-      const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-      await this.prismaService.user.update({
-        where: { id: user.id },
-        data: { refreshToken: refreshToken },
-      });
-      return {
-        success: true,
-        accessToken: `${accessToken}`,
-        refreshToken: `${refreshToken}`,
-      };
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Failed to sign in: ${error.message}`,
-      );
+    const user = await this.usersService.findByLogin(username);
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
+    if (!(await bcrypt.compare(pass, user.password))) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    const payload = { id: user.id };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    await this.prismaService.user.update({
+      where: { id: user.id },
+      data: { refreshToken: refreshToken },
+    });
+    return {
+      success: true,
+      accessToken: `${accessToken}`,
+      refreshToken: `${refreshToken}`,
+    };
   }
 
   async refreshTokens(refreshToken: string) {
-    try {
-      const payload = this.jwtService.verify(refreshToken);
-      const user = await this.usersService.findById(payload.id);
+    const payload = this.jwtService.verify(refreshToken);
+    const user = await this.usersService.findById(payload.id);
 
-      if (!user || user.refreshToken !== refreshToken) {
-        throw new UnauthorizedException('Invalid refresh token');
-      }
-
-      const newAccessToken = this.jwtService.sign(
-        { id: user.id },
-        { expiresIn: '15m' },
-      );
-      const newRefreshToken = this.jwtService.sign(
-        { id: user.id },
-        { expiresIn: '7d' },
-      );
-
-      await this.usersService.updateUserRefreshToken(user.id, newRefreshToken);
-
-      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
-    } catch (error) {
+    if (!user || user.refreshToken !== refreshToken) {
       throw new UnauthorizedException('Invalid refresh token');
     }
+
+    const newAccessToken = this.jwtService.sign(
+      { id: user.id },
+      { expiresIn: '15m' },
+    );
+    const newRefreshToken = this.jwtService.sign(
+      { id: user.id },
+      { expiresIn: '7d' },
+    );
+
+    await this.usersService.updateUserRefreshToken(user.id, newRefreshToken);
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
 
   async register(

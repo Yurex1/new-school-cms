@@ -35,66 +35,52 @@ export class SchoolService {
     if (!id) {
       throw new BadRequestException('School ID is required');
     }
-
-    try {
-      const result = await this.prisma.school.findUnique({ where: { id } });
-      if (!result) {
-        throw new NotFoundException(`School with ID ${id} not found`);
-      }
-      return result;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Error finding school',
-        error.message,
-      );
+    console.log('123123');
+    const result = await this.prisma.school.findUnique({ where: { id } });
+    console.log(result);
+    if (!result) {
+      throw new NotFoundException(`School with ID ${id} not found`);
     }
+    return result;
   }
 
   async deleteSchool(ids: string[]) {
     if (!ids || ids.length === 0) {
       throw new BadRequestException('School IDs are required for deletion');
     }
-
-    try {
-      await this.prisma.student.deleteMany({
-        where: {
-          school: {
-            id: {
-              in: ids,
-            },
-          },
-        },
-      });
-
-      await this.prisma.user.deleteMany({
-        where: {
-          school: {
-            id: {
-              in: ids,
-            },
-          },
-        },
-      });
-
-      const result = await this.prisma.school.deleteMany({
-        where: {
+    await this.prisma.student.deleteMany({
+      where: {
+        school: {
           id: {
             in: ids,
           },
         },
-      });
+      },
+    });
 
-      if (result.count === 0) {
-        throw new NotFoundException(`No schools found to delete`);
-      }
+    await this.prisma.user.deleteMany({
+      where: {
+        school: {
+          id: {
+            in: ids,
+          },
+        },
+      },
+    });
 
-      return 'Schools deleted successfully';
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Failed to delete schools',
-        error.message,
-      );
+    const result = await this.prisma.school.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    if (result.count === 0) {
+      throw new NotFoundException(`No schools found to delete`);
     }
+
+    return 'Schools deleted successfully';
   }
 
   async updateSchool(id: string, data: Prisma.SchoolUpdateInput) {
@@ -117,17 +103,10 @@ export class SchoolService {
   }
 
   async getAll() {
-    try {
-      const result = await this.prisma.school.findMany();
-      if (result.length === 0) {
-        throw new NotFoundException('No schools found');
-      }
-      return result;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Error fetching schools',
-        error.message,
-      );
+    const result = await this.prisma.school.findMany();
+    if (result.length === 0) {
+      throw new NotFoundException('No schools found');
     }
+    return result;
   }
 }

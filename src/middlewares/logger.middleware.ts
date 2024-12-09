@@ -17,9 +17,7 @@ export class LoggerMiddleware implements NestMiddleware {
     const status = res.statusCode;
 
     const token = this.extractTokenFromHeader(req);
-    console.log('Token:', token);
     if (!token) {
-      console.log('No token found');
       return next();
     }
     const payload = await this.jwtService.verifyAsync(token, {
