@@ -7,6 +7,7 @@ import {
   Get,
   Req,
   UseGuards,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user-dto';
@@ -38,6 +39,14 @@ export class UsersController {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     return await this.userService.findById(req.user.id);
+  }
+
+  @UseGuards(AuthGuard, AdminGuard)
+  @Post('updateSchoolForUser')
+  async updateSchoolForUser(
+    @Body() body: { userId: string; schoolId: string },
+  ) {
+    return await this.userService.updateUserSchool(body.userId, body.schoolId);
   }
 
   @UseGuards(AuthGuard)

@@ -35,7 +35,6 @@ export class SchoolService {
     if (!id) {
       throw new BadRequestException('School ID is required');
     }
-    console.log('123123');
     const result = await this.prisma.school.findUnique({ where: { id } });
     console.log(result);
     if (!result) {

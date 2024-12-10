@@ -33,6 +33,13 @@ export class UsersService {
     return user;
   }
 
+  async updateUserSchool(userId: string, schoolId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { school: { connect: { id: schoolId } } },
+    });
+  }
+
   // async findOne(username: string): Promise<User | undefined> {
   //   return this.users.find((user) => user.username === username);
   // }

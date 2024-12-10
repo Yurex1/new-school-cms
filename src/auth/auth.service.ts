@@ -87,6 +87,7 @@ export class AuthService {
     schoolId: string,
   ) {
     try {
+      isAdmin = false;
       const hashedPassword = await bcrypt.hash(password, 10);
       return this.usersService.createOne({
         login,
