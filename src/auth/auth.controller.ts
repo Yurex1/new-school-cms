@@ -28,6 +28,12 @@ export class AuthController {
       signInDto.login,
       signInDto.password,
     );
+    res.cookie('authToken', result.accessToken, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 600000,
+    });
     return res.json(result);
   }
 

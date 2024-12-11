@@ -16,11 +16,23 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async findById(id: string) {
+    console.log('id: ', id);
     const user = await this.prisma.user.findFirst({ where: { id } });
     if (user === null) {
       throw new NotFoundException(`User ${user} is not found`);
     }
     return user;
+  }
+
+  async getUserWithRefreshToken(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        refreshToken: true,
+      },
+    });
   }
 
   async findByLogin(login: string) {

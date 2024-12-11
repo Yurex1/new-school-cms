@@ -15,6 +15,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
 import { DeleteUserDto } from './dto/delete-user-dto';
 import { Request } from 'express';
+import * as jwt from 'jsonwebtoken';
 
 @Controller('/api/users')
 export class UsersController {
@@ -36,9 +37,9 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('me')
   async getProfile(@Req() req: Request) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    return await this.userService.findById(req.user.id);
+    const decodedToken: any = jwt.decode(req.cookies['authToken']);
+    console.log('decoded token: ', decodedToken);
+    return await this.userService.findById(decodedToken.id);
   }
 
   @UseGuards(AuthGuard, AdminGuard)
