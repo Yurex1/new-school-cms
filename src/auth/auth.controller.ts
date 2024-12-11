@@ -37,8 +37,8 @@ export class AuthController {
       registerUserDto.login,
       registerUserDto.password,
       registerUserDto.name,
-      registerUserDto.isAdmin,
-      registerUserDto.schoolId,
+      // registerUserDto.isAdmin,
+      // registerUserDto.schoolId,
     );
   }
 

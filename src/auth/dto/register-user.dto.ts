@@ -13,10 +13,10 @@ export class RegisterUserDto {
   @IsString()
   login: string;
 
-  @IsNotEmpty()
-  @IsBoolean()
-  isAdmin: boolean;
+  // @IsNotEmpty()
+  // @IsBoolean()
+  // isAdmin: boolean;
 
-  @IsString()
-  schoolId: string;
+  // @IsString()
+  // schoolId: string;
 }

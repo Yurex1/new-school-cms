@@ -19,9 +19,9 @@ model User {
 
   isAdmin Boolean
 
-  school School @relation(fields: [schoolId], references: [id])
+  school School? @relation(fields: [schoolId], references: [id])
 
-  schoolId String
+  schoolId String?
 
   refreshToken String?
 

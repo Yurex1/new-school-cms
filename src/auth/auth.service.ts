@@ -83,18 +83,19 @@ export class AuthService {
     login: string,
     password: string,
     username: string,
-    isAdmin: boolean,
-    schoolId: string,
+    // isAdmin: boolean,
   ) {
     try {
-      isAdmin = false;
+      // isAdmin = false;
       const hashedPassword = await bcrypt.hash(password, 10);
-      return this.usersService.createOne({
-        login,
-        password: hashedPassword,
-        name: username,
-        isAdmin,
-        school: { connect: { id: schoolId } },
+      return this.prismaService.user.create({
+        data: {
+          login,
+          password: hashedPassword,
+          name: username,
+          isAdmin: false,
+          schoolId: null,
+        },
       });
     } catch (error) {
       if (error instanceof ConflictException) {
