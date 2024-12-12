@@ -21,12 +21,4 @@ export class UpdateUserDto extends PartialType(RegisterUserDto) {
   @IsNotEmpty()
   @IsString()
   login: string;
-
-  @IsNotEmpty()
-  @IsBoolean()
-  isAdmin: boolean;
-
-  @IsString()
-  @IsNotEmpty()
-  schoolId: string;
 }

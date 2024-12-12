@@ -38,7 +38,6 @@ export class UsersController {
   @Get('me')
   async getProfile(@Req() req: Request) {
     const decodedToken: any = jwt.decode(req.cookies['authToken']);
-    console.log('decoded token: ', decodedToken);
     return await this.userService.findById(decodedToken.id);
   }
 

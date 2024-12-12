@@ -7,7 +7,9 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { Request, Response } from 'express';
-import { accessTokenSecret } from './constants';
+import { accessTokenSecret, refreshTokenSecret } from './constants';
+import * as jwt from 'jsonwebtoken';
+import { decode } from 'punycode';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -20,7 +22,6 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
     const accessToken = request.cookies['authToken'];
-    console.log('cookies: ', request.cookies);
     if (!accessToken) {
       throw new UnauthorizedException('Access token missing');
     }
@@ -53,16 +54,18 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(accessToken, {
+      await this.jwtService.verifyAsync(accessToken, {
         secret: accessTokenSecret.secret,
         ignoreExpiration: true,
       });
-
-      const userId = payload?.id;
+      const decodedToken = jwt.decode(accessToken);
+      console.log('DECODED TOKEN', decodedToken);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      const userId = decodedToken?.id;
       if (!userId) {
         throw new UnauthorizedException('Invalid access token payload');
       }
-
       const user = await this.usersService.findById(userId);
 
       if (!user || !user.refreshToken) {
@@ -74,19 +77,18 @@ export class AuthGuard implements CanActivate {
       const refreshTokenPayload = await this.jwtService.verifyAsync(
         refreshToken,
         {
-          secret: process.env.JWT_REFRESH_SECRET || 'refreshTokenSecret',
+          secret: refreshTokenSecret.secret,
         },
       );
-
       if (!refreshTokenPayload) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
       const newAccessToken = await this.jwtService.signAsync(
-        { userId: user.id },
+        { id: user.id },
         {
           secret: accessTokenSecret.secret || 'accessTokenSecret',
-          expiresIn: '15m',
+          expiresIn: '1h',
         },
       );
 
@@ -94,10 +96,10 @@ export class AuthGuard implements CanActivate {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
-        maxAge: 15 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-
-      request['user'] = { userId: user.id };
+      console.log('RETURNED TRUE');
+      request['user'] = { id: user.id };
       return true;
     } catch (err) {
       console.log('ERR', err);

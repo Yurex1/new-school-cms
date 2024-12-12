@@ -21,12 +21,11 @@ export class LoggerMiddleware implements NestMiddleware {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: accessTokenSecret.secret,
-      });
+      const payload = await this.jwtService.decode(token);
       console.log('payload', payload);
+      const userId = payload.id;
       const user: User | null = await this.prisma.user.findUnique({
-        where: { id: payload.id },
+        where: { id: userId },
       });
 
       if (user) {
@@ -39,7 +38,7 @@ export class LoggerMiddleware implements NestMiddleware {
           },
         });
       } else {
-        console.warn(`User with ID ${payload.userId} not found`);
+        console.warn(`User with ID ${userId} not found`);
       }
     } catch (error) {
       console.error(

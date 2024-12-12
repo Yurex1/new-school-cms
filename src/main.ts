@@ -8,8 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const corsOptions = {
-    origin: 'http://localhost:3000', // Frontend URL
-    credentials: true, // Allow cookies to be sent
+    origin: 'http://localhost:3000',
+    credentials: true,
   };
 
   app.useGlobalPipes(new ValidationPipe());
@@ -22,7 +22,7 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors(corsOptions); // Enable CORS with the specified options
+  app.enableCors(corsOptions);
 
   await app.listen(8030);
 }

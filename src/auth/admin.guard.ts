@@ -36,11 +36,11 @@ export class AdminGuard implements CanActivate {
     } catch (err) {
       throw new UnauthorizedException('Invalid access token');
     }
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
-    const userId = request['user'].userId;
+    const userId = request['user'].id;
     const user: User = await this.usersService.findById(userId);
-
     if (!user || !user.isAdmin) {
       throw new UnauthorizedException(
         "You don't have permission to access this resource",
