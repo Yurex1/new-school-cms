@@ -25,7 +25,6 @@ export class AuthGuard implements CanActivate {
     if (!accessToken) {
       throw new UnauthorizedException('Access token missing');
     }
-
     try {
       const payload = await this.jwtService.verifyAsync(accessToken, {
         secret: accessTokenSecret.secret,
@@ -35,7 +34,6 @@ export class AuthGuard implements CanActivate {
       if (!userId) {
         throw new UnauthorizedException('Invalid access token');
       }
-
       request['user'] = payload;
       return true;
     } catch (err) {
