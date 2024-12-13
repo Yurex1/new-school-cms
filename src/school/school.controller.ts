@@ -51,14 +51,10 @@ export class SchoolController {
   @UseGuards(AuthGuard)
   @Get()
   async getAll(@Request() req) {
-    console.log('request: ', req);
     const user = await this.userService.findById(req.user.id);
-    console.log(user);
     if (user.isAdmin === true) {
-      console.log('User is admin');
       return await this.schoolService.getAll();
     } else {
-      console.log('User is not admin');
       return [await this.schoolService.findSchool(user.schoolId)];
     }
   }
@@ -72,7 +68,6 @@ export class SchoolController {
   @UseGuards(AuthGuard)
   @Get('getAllStudents/:schoolId')
   async getAllStudents(@Param('schoolId') schoolId: string) {
-    console.log('schoolId: ', schoolId);
     return await this.schoolService.getAllStudents(schoolId);
   }
 }

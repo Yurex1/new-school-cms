@@ -22,7 +22,6 @@ export class LoggerMiddleware implements NestMiddleware {
 
     try {
       const payload = await this.jwtService.decode(token);
-      console.log('payload', payload);
       const userId = payload.id;
       const user: User | null = await this.prisma.user.findUnique({
         where: { id: userId },

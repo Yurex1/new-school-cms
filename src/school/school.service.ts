@@ -23,16 +23,21 @@ export class SchoolService {
   }
 
   async getAllStudents(schoolId: string) {
+    const firstTime = Date.now();
     if (!schoolId) {
       throw new BadRequestException('School ID is required');
     }
-    return await this.prisma.student.findMany({
+
+    const result = await this.prisma.student.findMany({
       where: {
         school: {
           id: schoolId,
         },
       },
     });
+    const secondTime = Date.now();
+    console.log('Time taken:', secondTime - firstTime);
+    return result;
   }
 
   async createSchool(name: string, type: string) {
@@ -114,10 +119,14 @@ export class SchoolService {
   }
 
   async getAll() {
+    const firstTime = Date.now();
     const result = await this.prisma.school.findMany();
+    const secondTime = Date.now();
     if (result.length === 0) {
       throw new NotFoundException('No schools found');
     }
+
+    console.log('Time taken:', secondTime - firstTime);
     return result;
   }
 }

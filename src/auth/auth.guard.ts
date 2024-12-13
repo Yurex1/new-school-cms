@@ -59,7 +59,6 @@ export class AuthGuard implements CanActivate {
         ignoreExpiration: true,
       });
       const decodedToken = jwt.decode(accessToken);
-      console.log('DECODED TOKEN', decodedToken);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
       const userId = decodedToken?.id;
@@ -98,7 +97,6 @@ export class AuthGuard implements CanActivate {
         sameSite: 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-      console.log('RETURNED TRUE');
       request['user'] = { id: user.id };
       return true;
     } catch (err) {
