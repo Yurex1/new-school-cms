@@ -5,7 +5,7 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
-  Request,
+  Req,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -15,6 +15,8 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 import { SignInUserDto } from './dto/signIn-user-dto';
 import { AuthService } from './auth.service';
+import { AuthGuard } from './auth.guard';
+import { Request } from 'express';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -28,6 +30,12 @@ export class AuthController {
       signInDto.login,
       signInDto.password,
     );
+    res.cookie('authToken', result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     return res.json(result);
   }
 
@@ -37,9 +45,22 @@ export class AuthController {
       registerUserDto.login,
       registerUserDto.password,
       registerUserDto.name,
-      registerUserDto.isAdmin,
-      registerUserDto.schoolId,
+      // registerUserDto.isAdmin,
+      // registerUserDto.schoolId,
     );
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('logout')
+  async logout(@Req() req: Request, @Res() res: Response) {
+    const accessToken = req.cookies['authToken'];
+    if (!accessToken) {
+      throw new UnauthorizedException('Access token missing');
+    }
+
+    res.clearCookie('authToken', { path: '/', httpOnly: true });
+
+    return res.status(200).json({ success: true });
   }
 
   @Post('refresh')

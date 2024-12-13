@@ -3,9 +3,8 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Request, Response, NextFunction } from 'express';
 import { PrismaService } from 'src/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from '../auth/constants';
-import { User } from '@prisma/client'; // Importing Prisma User type
-
+import { User } from '@prisma/client';
+import { accessTokenSecret } from 'src/auth/constants';
 @Injectable()
 @UseGuards(AuthGuard)
 export class LoggerMiddleware implements NestMiddleware {
@@ -16,34 +15,37 @@ export class LoggerMiddleware implements NestMiddleware {
     const path = req.originalUrl;
     const status = res.statusCode;
 
-    const token = this.extractTokenFromHeader(req);
+    const token = req.cookies['authToken'];
     if (!token) {
       return next();
     }
-    const payload = await this.jwtService.verifyAsync(token, {
-      secret: jwtConstants.secret,
-    });
 
-    const user: User | null = await this.prisma.user.findUnique({
-      where: { id: payload.id },
-    });
-
-    if (user) {
-      await this.prisma.log.create({
-        data: {
-          method,
-          path,
-          status,
-          userAgent: user.login,
-        },
+    try {
+      const payload = await this.jwtService.decode(token);
+      const userId = payload.id;
+      const user: User | null = await this.prisma.user.findUnique({
+        where: { id: userId },
       });
-    } else {
-      console.log('User not found');
+
+      if (user) {
+        await this.prisma.log.create({
+          data: {
+            method,
+            path,
+            status,
+            userAgent: user.id,
+          },
+        });
+      } else {
+        console.warn(`User with ID ${userId} not found`);
+      }
+    } catch (error) {
+      console.error(
+        'Error verifying token or logging user activity:',
+        error.message,
+      );
     }
+
     next();
-  }
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

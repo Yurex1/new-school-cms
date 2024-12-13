@@ -6,8 +6,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from 'src/users/users.module';
-// import { ConfigService } from '@nestjs/config';
-import { jwtConstants } from './constants';
+import { accessTokenSecret, refreshTokenSecret } from './constants';
 import { AdminGuard } from './admin.guard';
 import { PrismaService } from 'src/prisma.service';
 
@@ -17,8 +16,12 @@ import { PrismaService } from 'src/prisma.service';
     PassportModule,
     JwtModule.register({
       global: true,
-      secret: jwtConstants.secret,
+      secret: accessTokenSecret.secret,
       signOptions: { expiresIn: '1h' },
+    }),
+    JwtModule.register({
+      secret: refreshTokenSecret.secret,
+      signOptions: { expiresIn: '7d' },
     }),
   ],
   providers: [

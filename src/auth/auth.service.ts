@@ -11,7 +11,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-
+import { accessTokenSecret, refreshTokenSecret } from './constants';
 @Injectable()
 export class AuthService {
   constructor(
@@ -34,8 +34,8 @@ export class AuthService {
     }
   }
 
-  async signIn(username: string, pass: string) {
-    const user = await this.usersService.findByLogin(username);
+  async signIn(login: string, pass: string) {
+    const user = await this.usersService.findByLogin(login);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -43,9 +43,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     const payload = { id: user.id };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
+    const accessToken = this.jwtService.sign(payload, {
+      secret: accessTokenSecret.secret,
+      expiresIn: '15m',
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: refreshTokenSecret.secret,
+      expiresIn: '7d',
+    });
     await this.prismaService.user.update({
       where: { id: user.id },
       data: { refreshToken: refreshToken },
@@ -53,7 +58,6 @@ export class AuthService {
     return {
       success: true,
       accessToken: `${accessToken}`,
-      refreshToken: `${refreshToken}`,
     };
   }
 
@@ -65,13 +69,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const newAccessToken = this.jwtService.sign(
-      { id: user.id },
-      { expiresIn: '15m' },
-    );
     const newRefreshToken = this.jwtService.sign(
       { id: user.id },
-      { expiresIn: '7d' },
+      { secret: process.env.JWT_SECRET, expiresIn: '7d' },
+    );
+    const newAccessToken = this.jwtService.sign(
+      { id: user.id },
+      { secret: newRefreshToken, expiresIn: '15m' },
     );
 
     await this.usersService.updateUserRefreshToken(user.id, newRefreshToken);
@@ -83,17 +87,19 @@ export class AuthService {
     login: string,
     password: string,
     username: string,
-    isAdmin: boolean,
-    schoolId: string,
+    // isAdmin: boolean,
   ) {
     try {
+      // isAdmin = false;
       const hashedPassword = await bcrypt.hash(password, 10);
-      return this.usersService.createOne({
-        login,
-        password: hashedPassword,
-        name: username,
-        isAdmin,
-        school: { connect: { id: schoolId } },
+      return this.prismaService.user.create({
+        data: {
+          login,
+          password: hashedPassword,
+          name: username,
+          isAdmin: false,
+          schoolId: null,
+        },
       });
     } catch (error) {
       if (error instanceof ConflictException) {

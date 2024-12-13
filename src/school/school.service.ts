@@ -22,6 +22,21 @@ export class SchoolService {
     }
   }
 
+  async getAllStudents(schoolId: string) {
+    if (!schoolId) {
+      throw new BadRequestException('School ID is required');
+    }
+
+    const result = await this.prisma.student.findMany({
+      where: {
+        school: {
+          id: schoolId,
+        },
+      },
+    });
+    return result;
+  }
+
   async createSchool(name: string, type: string) {
     if (!name || !type) {
       throw new BadRequestException(
@@ -35,9 +50,7 @@ export class SchoolService {
     if (!id) {
       throw new BadRequestException('School ID is required');
     }
-    console.log('123123');
     const result = await this.prisma.school.findUnique({ where: { id } });
-    console.log(result);
     if (!result) {
       throw new NotFoundException(`School with ID ${id} not found`);
     }
@@ -107,6 +120,7 @@ export class SchoolService {
     if (result.length === 0) {
       throw new NotFoundException('No schools found');
     }
+
     return result;
   }
 }

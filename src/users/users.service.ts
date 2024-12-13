@@ -23,6 +23,17 @@ export class UsersService {
     return user;
   }
 
+  async getUserWithRefreshToken(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        refreshToken: true,
+      },
+    });
+  }
+
   async findByLogin(login: string) {
     const user = await this.prisma.user.findFirst({
       where: { login: login },
@@ -31,6 +42,34 @@ export class UsersService {
       throw new NotFoundException(`User with login ${login} is not found`);
     }
     return user;
+  }
+
+  async updateMe(id: string, data: Prisma.UserUpdateInput) {
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password.toString(), 10);
+    }
+    const user = await this.prisma.user.findFirst({
+      where: {
+        login: data.login as string,
+      },
+    });
+    if (user && user.id !== id) {
+      throw new ConflictException(
+        `User with login ${data.login} already exists`,
+      );
+    }
+    if (data.login)
+      return await this.prisma.user.update({
+        where: { id },
+        data,
+      });
+  }
+
+  async updateUserSchool(userId: string, schoolId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { school: { connect: { id: schoolId } } },
+    });
   }
 
   // async findOne(username: string): Promise<User | undefined> {
@@ -84,7 +123,13 @@ export class UsersService {
 
   async updateUser(id: string, data: Prisma.UserUpdateInput) {
     const user: User = await this.findById(id);
-    data.password = await bcrypt.hash(data.password.toString(), 10);
+    if (data.id || data.refreshToken) {
+      throw new BadRequestException(
+        'You cannot update user ID or refresh token',
+      );
+    }
+    if (data.password)
+      data.password = await bcrypt.hash(data.password.toString(), 10);
     return await this.prisma.user.update({
       where: { id: user.id },
       data,

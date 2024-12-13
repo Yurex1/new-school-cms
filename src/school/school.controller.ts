@@ -17,7 +17,7 @@ import { DeleteSchoolDto } from './dto/delete-school-dto';
 import { UsersService } from '../users/users.service';
 import { AdminGuard } from 'src/auth/admin.guard';
 
-@Controller('/api/school')
+@Controller('/api/schools')
 export class SchoolController {
   constructor(
     private readonly schoolService: SchoolService,
@@ -55,6 +55,7 @@ export class SchoolController {
     if (user.isAdmin === true) {
       return await this.schoolService.getAll();
     } else {
+      console.log('user.schoolId', user.schoolId);
       return [await this.schoolService.findSchool(user.schoolId)];
     }
   }
@@ -63,5 +64,11 @@ export class SchoolController {
   @Delete()
   async deleteOne(@Body() deleteSchoolDto: DeleteSchoolDto) {
     return await this.schoolService.deleteSchool(deleteSchoolDto.ids);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('getAllStudents/:schoolId')
+  async getAllStudents(@Param('schoolId') schoolId: string) {
+    return await this.schoolService.getAllStudents(schoolId);
   }
 }
