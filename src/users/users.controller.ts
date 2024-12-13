@@ -16,21 +16,40 @@ import { AdminGuard } from 'src/auth/admin.guard';
 import { DeleteUserDto } from './dto/delete-user-dto';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
+import { UpdateMeDto } from './dto/update-me-dto';
 
 @Controller('/api/users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @UseGuards(AuthGuard, AdminGuard)
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @Put('updateUser/:id')
+  async update(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return await this.userService.updateUser(id, updateUserDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('updateMe')
+  async updateMe(@Req() req: Request, @Body() updateMeDto: UpdateMeDto) {
+    const decodedToken: any = jwt.decode(req.cookies['authToken']);
+    console.log('decodedToken', decodedToken);
+    return await this.userService.updateMe(decodedToken.id, updateMeDto);
   }
 
   @UseGuards(AuthGuard, AdminGuard)
   @Delete()
-  async delete(@Body() deleteUserDto: DeleteUserDto, @Req() req: Request) {
-    // console.log('Cookies:', req.cookies);
+  async delete(@Req() request: Request, @Body() deleteUserDto: DeleteUserDto) {
+    if (
+      deleteUserDto.ids.includes(
+        (jwt.decode(request.cookies['authToken']) as any).id,
+      )
+    ) {
+      return 'You cannot delete yourself';
+    }
     return await this.userService.deleteMany(deleteUserDto.ids);
   }
 

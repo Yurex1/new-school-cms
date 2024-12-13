@@ -44,6 +44,27 @@ export class UsersService {
     return user;
   }
 
+  async updateMe(id: string, data: Prisma.UserUpdateInput) {
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password.toString(), 10);
+    }
+    const user = await this.prisma.user.findFirst({
+      where: {
+        login: data.login as string,
+      },
+    });
+    if (user && user.id !== id) {
+      throw new ConflictException(
+        `User with login ${data.login} already exists`,
+      );
+    }
+    if (data.login)
+      return await this.prisma.user.update({
+        where: { id },
+        data,
+      });
+  }
+
   async updateUserSchool(userId: string, schoolId: string) {
     return this.prisma.user.update({
       where: { id: userId },
