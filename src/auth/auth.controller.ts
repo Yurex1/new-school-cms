@@ -32,8 +32,8 @@ export class AuthController {
     );
     res.cookie('authToken', result.accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     console.log('result', result);
