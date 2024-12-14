@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from '@prisma/client';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class SchoolService {
@@ -58,38 +59,39 @@ export class SchoolService {
   }
 
   async deleteSchool(ids: string[]) {
-    if (!ids || ids.length === 0) {
+    if (!ids || ids.length === 0 || Object.keys(ids).length === 0) {
       throw new BadRequestException('School IDs are required for deletion');
     }
-    await this.prisma.student.deleteMany({
-      where: {
-        school: {
+    const [_, __, schoolsResult] = await Promise.all([
+      this.prisma.student.deleteMany({
+        where: {
+          school: {
+            id: {
+              in: ids,
+            },
+          },
+        },
+      }),
+      this.prisma.user.updateMany({
+        where: {
+          schoolId: {
+            in: ids,
+          },
+        },
+        data: {
+          schoolId: null,
+        },
+      }),
+      this.prisma.school.deleteMany({
+        where: {
           id: {
             in: ids,
           },
         },
-      },
-    });
+      }),
+    ]);
 
-    await this.prisma.user.deleteMany({
-      where: {
-        school: {
-          id: {
-            in: ids,
-          },
-        },
-      },
-    });
-
-    const result = await this.prisma.school.deleteMany({
-      where: {
-        id: {
-          in: ids,
-        },
-      },
-    });
-
-    if (result.count === 0) {
+    if (schoolsResult.count === 0) {
       throw new NotFoundException(`No schools found to delete`);
     }
 

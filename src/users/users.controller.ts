@@ -38,7 +38,6 @@ export class UsersController {
   @Put('updateMe')
   async updateMe(@Req() req: Request, @Body() updateMeDto: UpdateMeDto) {
     const decodedToken: any = jwt.decode(req.cookies['authToken']);
-    console.log('decodedToken', decodedToken);
     return await this.userService.updateMe(decodedToken.id, updateMeDto);
   }
 

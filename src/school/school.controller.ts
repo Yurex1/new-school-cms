@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { SchoolService } from './school.service';
 import { CreateSchoolDto } from './dto/create-school.dto';
@@ -55,15 +56,14 @@ export class SchoolController {
     if (user.isAdmin === true) {
       return await this.schoolService.getAll();
     } else {
-      console.log('user.schoolId', user.schoolId);
       return [await this.schoolService.findSchool(user.schoolId)];
     }
   }
 
   @UseGuards(AuthGuard, AdminGuard)
   @Delete()
-  async deleteOne(@Body() deleteSchoolDto: DeleteSchoolDto) {
-    return await this.schoolService.deleteSchool(deleteSchoolDto.ids);
+  async deleteSchools(@Query('ids') ids: string[]) {
+    return await this.schoolService.deleteSchool(ids);
   }
 
   @UseGuards(AuthGuard)
