@@ -9,12 +9,12 @@ import {
   UseGuards,
   Request,
   Query,
-  BadRequestException,
 } from '@nestjs/common';
 import { SchoolService } from './school.service';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { UpdateSchoolDto } from './dto/update-school.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { DeleteSchoolDto } from './dto/delete-school-dto';
 import { UsersService } from '../users/users.service';
 import { AdminGuard } from 'src/auth/admin.guard';
 
@@ -44,6 +44,12 @@ export class SchoolController {
   }
 
   @UseGuards(AuthGuard)
+  @Get(':id')
+  async get(@Param('id') id: string) {
+    return await this.schoolService.findSchool(id);
+  }
+
+  @UseGuards(AuthGuard)
   @Get()
   async getAll(@Request() req) {
     const user = await this.userService.findById(req.user.id);
@@ -54,24 +60,15 @@ export class SchoolController {
     }
   }
 
-  @UseGuards(AuthGuard)
-  @Get(':id')
-  async get(@Param('id') id: string) {
-    return await this.schoolService.findSchool(id);
+  @UseGuards(AuthGuard, AdminGuard)
+  @Delete()
+  async deleteSchools(@Query('ids') ids: string[]) {
+    return await this.schoolService.deleteSchool(ids);
   }
 
   @UseGuards(AuthGuard)
   @Get('getAllStudents/:schoolId')
   async getAllStudents(@Param('schoolId') schoolId: string) {
-    if (!schoolId) {
-      throw new BadRequestException('School ID is required');
-    }
     return await this.schoolService.getAllStudents(schoolId);
-  }
-
-  @UseGuards(AuthGuard, AdminGuard)
-  @Delete()
-  async deleteSchools(@Query('ids') ids: string[]) {
-    return await this.schoolService.deleteSchool(ids);
   }
 }

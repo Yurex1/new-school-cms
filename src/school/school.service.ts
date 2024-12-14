@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from '@prisma/client';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class SchoolService {
