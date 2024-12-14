@@ -10,7 +10,7 @@ async function bootstrap() {
   const corsOptions = {
     origin: [
       'http://localhost:3000',
-      'https://student-manager-frontend-mu.vercel.app',
+      'https://student-manager-frontend-e3pdppr6e-uzhs-projects.vercel.app/',
     ],
     credentials: true,
   };
