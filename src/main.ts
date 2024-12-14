@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'https://student-manager-frontend-e3pdppr6e-uzhs-projects.vercel.app/',
+    ],
     credentials: true,
   };
 
