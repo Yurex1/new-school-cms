@@ -121,8 +121,15 @@ export class UsersService {
     return users;
   }
 
-  async updateUser(id: string, data: Prisma.UserUpdateInput) {
+  async updateUser(
+    requestCreatorId: string,
+    id: string,
+    data: Prisma.UserUpdateInput,
+  ) {
     const user: User = await this.findById(id);
+    if (user.id === requestCreatorId && data.isAdmin !== user.isAdmin) {
+      throw new BadRequestException('You cannot change your own admin status');
+    }
     if (data.id || data.refreshToken) {
       throw new BadRequestException(
         'You cannot update user ID or refresh token',

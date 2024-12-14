@@ -10,15 +10,13 @@ import {
 } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(RegisterUserDto) {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsNotEmpty()
-  @IsString()
-  password: string;
-
-  @IsNotEmpty()
-  @IsString()
-  login: string;
+  // @IsNotEmpty()
+  // @IsString()
+  // name: string;
+  // @IsNotEmpty()
+  // @IsString()
+  // password: string;
+  // @IsNotEmpty()
+  // @IsString()
+  // login: string;
 }
