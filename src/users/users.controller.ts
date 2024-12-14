@@ -29,7 +29,9 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return await this.userService.updateUser(id, updateUserDto);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    return await this.userService.updateUser(req['user'].id, id, updateUserDto);
   }
 
   @UseGuards(AuthGuard)
