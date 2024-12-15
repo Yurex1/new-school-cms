@@ -30,8 +30,7 @@ export class AuthController {
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    console.log('result', result);
-    return res.json(result);
+    return res.json({ success: true });
   }
 
   @Post('register')
