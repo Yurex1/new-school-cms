@@ -111,8 +111,12 @@ export class AuthService {
   ) {
     try {
       // isAdmin = false;
+      const user = await this.usersService.findByLogin(login);
+      if (user) {
+        throw new ConflictException('User with this login already exists');
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
-      return this.prismaService.user.create({
+      return await this.prismaService.user.create({
         data: {
           login,
           password: hashedPassword,
@@ -122,9 +126,6 @@ export class AuthService {
         },
       });
     } catch (error) {
-      if (error instanceof ConflictException) {
-        throw new ConflictException(error.message);
-      }
       throw new InternalServerErrorException(
         `Failed to register user: ${error.message}`,
       );
