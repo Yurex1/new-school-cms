@@ -1,7 +1,5 @@
-export const refreshTokenSecret = {
-  secret: 'SZtsS3XuxBFjDsg3TwP6yOYHWqA4HzEAciK9YT7hb9juEW1UTKqXRfbfjHsV5Hzt',
-};
+import { ConfigService } from '@nestjs/config';
 
-export const accessTokenSecret = {
-  secret: 'wwm1ThiXWpAgCUGR0WSByO9xZo2PBMSkbHYj7lZWFRYIhLRxeAw8C6haAeVY9m3q',
-};
+export const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
+
+export const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
