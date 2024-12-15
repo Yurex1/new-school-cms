@@ -11,7 +11,6 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -53,10 +52,9 @@ export class AuthService {
     if (!(await bcrypt.compare(pass, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
-    const tokens = this.generateTokens(user.id);
-    const accessToken = tokens.accessToken;
-    const refreshToken = tokens.refreshToken;
+    const { accessToken, refreshToken } = this.generateTokens(user.id);
+    // const accessToken = tokens.accessToken;
+    // const refreshToken = tokens.refreshToken;
 
     await this.prismaService.user.update({
       where: { id: user.id },
