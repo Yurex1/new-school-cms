@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { ConfigService } from '@nestjs/config';
+import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -104,8 +105,9 @@ export class AuthService {
 
   async register(login: string, password: string, username: string) {
     try {
-      // isAdmin = false;
-      const user = await this.usersService.findByLogin(login);
+      const user = await this.prismaService.user.findUnique({
+        where: { login: login },
+      });
       if (user) {
         throw new ConflictException('User with this login already exists');
       }
