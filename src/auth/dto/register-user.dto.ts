@@ -12,11 +12,4 @@ export class RegisterUserDto {
   @IsNotEmpty()
   @IsString()
   login: string;
-
-  // @IsNotEmpty()
-  // @IsBoolean()
-  // isAdmin: boolean;
-
-  // @IsString()
-  // schoolId: string;
 }

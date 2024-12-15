@@ -4,7 +4,6 @@ import { Request, Response, NextFunction } from 'express';
 import { PrismaService } from 'src/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { accessTokenSecret } from 'src/auth/constants';
 @Injectable()
 @UseGuards(AuthGuard)
 export class LoggerMiddleware implements NestMiddleware {

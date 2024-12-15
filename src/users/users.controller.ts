@@ -23,6 +23,14 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @UseGuards(AuthGuard, AdminGuard)
+  @Post('updateSchoolForUser')
+  async updateSchoolForUser(
+    @Body() body: { userId: string; schoolId: string },
+  ) {
+    return await this.userService.updateUserSchool(body.userId, body.schoolId);
+  }
+
+  @UseGuards(AuthGuard, AdminGuard)
   @Put('updateUser/:id')
   async update(
     @Req() req: Request,
@@ -41,6 +49,19 @@ export class UsersController {
     return await this.userService.updateMe(decodedToken.id, updateMeDto);
   }
 
+  @UseGuards(AuthGuard)
+  @Get('me')
+  async getProfile(@Req() req: Request) {
+    const decodedToken: any = jwt.decode(req.cookies['authToken']);
+    return await this.userService.findById(decodedToken.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  async getAllUsers() {
+    return await this.userService.getAllUsers();
+  }
+
   @UseGuards(AuthGuard, AdminGuard)
   @Delete()
   async delete(@Req() request: Request, @Body() deleteUserDto: DeleteUserDto) {
@@ -52,26 +73,5 @@ export class UsersController {
       return 'You cannot delete yourself';
     }
     return await this.userService.deleteMany(deleteUserDto.ids);
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('me')
-  async getProfile(@Req() req: Request) {
-    const decodedToken: any = jwt.decode(req.cookies['authToken']);
-    return await this.userService.findById(decodedToken.id);
-  }
-
-  @UseGuards(AuthGuard, AdminGuard)
-  @Post('updateSchoolForUser')
-  async updateSchoolForUser(
-    @Body() body: { userId: string; schoolId: string },
-  ) {
-    return await this.userService.updateUserSchool(body.userId, body.schoolId);
-  }
-
-  @UseGuards(AuthGuard)
-  @Get()
-  async getAllUsers() {
-    return await this.userService.getAllUsers();
   }
 }

@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const payload = await this.jwtService.verifyAsync(accessToken, {
-        secret: accessTokenSecret.secret,
+        secret: accessTokenSecret,
       });
 
       const userId = payload?.id;
@@ -53,7 +53,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       await this.jwtService.verifyAsync(accessToken, {
-        secret: accessTokenSecret.secret,
+        secret: accessTokenSecret,
         ignoreExpiration: true,
       });
       const decodedToken = jwt.decode(accessToken);
@@ -74,7 +74,7 @@ export class AuthGuard implements CanActivate {
       const refreshTokenPayload = await this.jwtService.verifyAsync(
         refreshToken,
         {
-          secret: refreshTokenSecret.secret,
+          secret: refreshTokenSecret,
         },
       );
       if (!refreshTokenPayload) {
@@ -84,7 +84,7 @@ export class AuthGuard implements CanActivate {
       const newAccessToken = await this.jwtService.signAsync(
         { id: user.id },
         {
-          secret: accessTokenSecret.secret || 'accessTokenSecret',
+          secret: accessTokenSecret || 'accessTokenSecret',
           expiresIn: '1h',
         },
       );

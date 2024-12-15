@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from '@prisma/client';
-import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class SchoolService {
@@ -44,6 +43,15 @@ export class SchoolService {
         'Name and type are required to create a school',
       );
     }
+
+    const existingSchool = await this.prisma.school.findUnique({
+      where: { name },
+    });
+
+    if (existingSchool) {
+      throw new BadRequestException('School with this name already exists');
+    }
+
     return await this.createOne({ name, type });
   }
 
