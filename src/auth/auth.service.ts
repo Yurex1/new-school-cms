@@ -104,9 +104,8 @@ export class AuthService {
 
   async register(login: string, password: string, username: string) {
     try {
-      const user = await this.prismaService.user.findUnique({
-        where: { login: login },
-      });
+      // isAdmin = false;
+      const user = await this.usersService.findByLogin(login);
       if (user) {
         throw new ConflictException('User with this login already exists');
       }
