@@ -37,6 +37,7 @@ export class StudentsController {
     //@ts-ignore
     const user = await this.userService.findById(req.user.id);
     if (user.isAdmin) {
+      // можна забрати createStudentDto на майбутнє
       return this.studentsService.createOne({
         fullName: createStudentDto.fullName,
         locationOfLiving: createStudentDto.locationOfLiving,
@@ -74,13 +75,30 @@ export class StudentsController {
     //@ts-ignore
     const user = await this.userService.findById(req.user.id);
     if (user.isAdmin) {
-      this.studentsService.updateOne(id, updateStudentDto);
+      return await this.studentsService.updateOne(id, updateStudentDto);
     } else {
       if (user.schoolId === updateStudentDto.schoolId) {
-        this.studentsService.updateOne(id, updateStudentDto);
+        return await this.studentsService.updateOne(id, updateStudentDto);
       } else {
         return 'You cannot update students from other schools';
       }
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  async get(@Param('id') id: string) {
+    return await this.studentsService.findOne(id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  async getAll(@Req() req) {
+    const user = await this.userService.findById(req.user.id);
+    if (user.isAdmin === true) {
+      return await this.studentsService.getAll();
+    } else {
+      return await this.studentsService.getStudentsBySchoolId(user.schoolId);
     }
   }
 
@@ -110,23 +128,6 @@ export class StudentsController {
       }
 
       return this.studentsService.deleteMany(ids);
-    }
-  }
-
-  @UseGuards(AuthGuard)
-  @Get(':id')
-  async get(@Param('id') id: string) {
-    return await this.studentsService.findOne(id);
-  }
-
-  @UseGuards(AuthGuard)
-  @Get()
-  async getAll(@Req() req) {
-    const user = await this.userService.findById(req.user.id);
-    if (user.isAdmin === true) {
-      return await this.studentsService.getAll();
-    } else {
-      return await this.studentsService.getStudentsBySchoolId(user.schoolId);
     }
   }
 }
