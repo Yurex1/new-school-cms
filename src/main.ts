@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as session from 'express-session';
+import * as session from 'cookie-session';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 
@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'https://student-manager-frontend-mu.vercel.app',
+    ],
     credentials: true,
   };
 

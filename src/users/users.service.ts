@@ -16,7 +16,10 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async findById(id: string) {
-    const user = await this.prisma.user.findFirst({ where: { id } });
+    const user = await this.prisma.user.findFirst({
+      where: { id },
+      include: { school: true },
+    });
     if (user === null) {
       throw new NotFoundException(`User ${user} is not found`);
     }
@@ -135,8 +138,9 @@ export class UsersService {
         'You cannot update user ID or refresh token',
       );
     }
-    if (data.password)
+    if (data.password) {
       data.password = await bcrypt.hash(data.password.toString(), 10);
+    }
     return await this.prisma.user.update({
       where: { id: user.id },
       data,
