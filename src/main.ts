@@ -11,7 +11,11 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'https://student-manager-frontend-mu.vercel.app',
+      'http://172.20.10.4',
+      'https://172.20.10.4',
     ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true,
   };
 
@@ -22,6 +26,7 @@ async function bootstrap() {
       secret: process.env.SESSION_SECRET || 'default-secret',
       resave: false,
       saveUninitialized: false,
+      secure: process.env.NODE_ENV === 'production',
     }),
   );
 
