@@ -34,6 +34,7 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<User | null> {
     try {
       const user = await this.usersService.findByLogin(username);
+
       if (user && (await bcrypt.compare(password, user.password))) {
         return user;
       }
@@ -110,6 +111,9 @@ export class AuthService {
       });
       if (user) {
         throw new ConflictException('User with this login already exists');
+      }
+      if (login.length < 4) {
+        throw new ConflictException('Login must be at least 4 characters long');
       }
       const hashedPassword = await bcrypt.hash(password, 10);
       return await this.prismaService.user.create({

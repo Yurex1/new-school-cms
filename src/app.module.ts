@@ -6,7 +6,6 @@ import { PrismaService } from './prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { SchoolModule } from './school/school.module';
 import { StudentsModule } from './students/students.module';
-import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -33,9 +32,9 @@ import { APP_GUARD } from '@nestjs/core';
     },
   ],
 })
-// export class AppModule {}
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('/api/users');
-  }
-}
+export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(LoggerMiddleware).forRoutes('/api/users');
+//   }
+// }

@@ -70,7 +70,7 @@ export class SchoolService {
     if (!ids || ids.length === 0 || Object.keys(ids).length === 0) {
       throw new BadRequestException('School IDs are required for deletion');
     }
-    const [_, __, schoolsResult] = await Promise.all([
+    const [_, __, schoolsResult] = await this.prisma.$transaction([
       this.prisma.student.deleteMany({
         where: {
           school: {
@@ -98,6 +98,7 @@ export class SchoolService {
         },
       }),
     ]);
+    console.log(schoolsResult);
 
     if (schoolsResult.count === 0) {
       throw new NotFoundException(`No schools found to delete`);
@@ -126,11 +127,13 @@ export class SchoolService {
   }
 
   async getAll() {
+    const timeNow = Date.now();
     const result = await this.prisma.school.findMany();
     if (result.length === 0) {
       throw new NotFoundException('No schools found');
     }
-
+    const timeAfter = Date.now();
+    console.log('Time taken', timeAfter - timeNow);
     return result;
   }
 }
